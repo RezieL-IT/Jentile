@@ -23,9 +23,14 @@
 
   /* ---------------------------------------------------------------
      2. Costruzione dinamica della galleria a mosaico
+     (colonne gestite via JS invece di CSS multi-column: alcuni
+     browser mobile, in particolare Safari/WebKit, calcolano male
+     le larghezze percentuali dentro un layout column-count e
+     fanno sconfinare le immagini fuori dalla colonna)
      --------------------------------------------------------------- */
   var grid = document.getElementById("gallery-grid");
   var data = (typeof GALLERY_DATA !== "undefined" ? GALLERY_DATA : []);
+  var figures = [];
 
   function spanClassFor(index) {
     if (index % 5 === 2) return "gallery__item--tall";
@@ -33,7 +38,12 @@
     return "";
   }
 
-  var fragment = document.createDocumentFragment();
+  function heightUnitFor(index) {
+    var cls = spanClassFor(index);
+    if (cls === "gallery__item--tall") return 1.5;
+    if (cls === "gallery__item--short") return 1.15;
+    return 1.333;
+  }
 
   data.forEach(function (item, index) {
     var hasCaption = !!item.caption;
@@ -85,10 +95,47 @@
       }
     });
 
-    fragment.appendChild(figure);
+    figures.push(figure);
   });
 
-  if (grid) grid.appendChild(fragment);
+  var currentColumnCount = 0;
+
+  function columnCountForViewport() {
+    return window.innerWidth > 1024 ? 3 : 2;
+  }
+
+  function layoutGalleryColumns() {
+    if (!grid) return;
+    var count = columnCountForViewport();
+    if (count === currentColumnCount) return;
+    currentColumnCount = count;
+
+    grid.innerHTML = "";
+    var columns = [];
+    for (var c = 0; c < count; c++) {
+      var col = document.createElement("div");
+      col.className = "gallery__column";
+      grid.appendChild(col);
+      columns.push({ el: col, height: 0 });
+    }
+
+    figures.forEach(function (figure, index) {
+      var shortest = columns[0];
+      for (var i = 1; i < columns.length; i++) {
+        if (columns[i].height < shortest.height) shortest = columns[i];
+      }
+      shortest.el.appendChild(figure);
+      shortest.height += heightUnitFor(index);
+    });
+  }
+
+  layoutGalleryColumns();
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(layoutGalleryColumns, 150);
+  });
 
   /* ---------------------------------------------------------------
      3. Reveal all'ingresso in viewport
