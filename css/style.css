@@ -511,7 +511,7 @@ button{ font-family: inherit; cursor: pointer; }
   display: block; font-family: var(--font-display); font-style: italic; font-weight: 500;
   color: var(--gold); font-size: 0.95rem; margin-bottom: 0.5rem;
 }
-.lightbox__text{ font-size: 1rem; font-weight: 300; line-height: 1.7; color: rgba(250,245,233,0.92); }
+.lightbox__text{ font-size: 1rem; font-weight: 300; line-height: 1.7; color: rgba(250,245,233,0.92); text-align: left; }
 .lightbox__text--unknown{ font-style: italic; color: rgba(250,245,233,0.55); }
 
 .lightbox__close{
@@ -537,11 +537,10 @@ button{ font-family: inherit; cursor: pointer; }
 
 /* -------------------------- Responsive -------------------------- */
 @media (max-width: 1024px){
-  .event__inner{ grid-template-columns: 1fr; gap: 3rem; text-align: center; }
-  .event__poster{ max-width: 280px; }
-  .event__title{ margin-left: auto; margin-right: auto; }
-  .event__text{ margin-left: auto; margin-right: auto; }
-  .event__facts{ align-items: center; }
+  .event__inner{ grid-template-columns: 1fr; gap: 2.6rem; text-align: left; }
+  .event__poster{ max-width: 280px; margin: 0 auto; }
+  .event__title{ max-width: none; }
+  .event__facts{ align-items: flex-start; }
   .story__columns{ grid-template-columns: 1fr; gap: 2rem; }
   .credits__grid{ grid-template-columns: repeat(2, 1fr); }
 }
